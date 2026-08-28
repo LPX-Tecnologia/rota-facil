@@ -16,6 +16,9 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Habilitar persistência offline (opcional)
+// Habilitar persistência offline
 db.enablePersistence()
   .catch(err => console.error("Erro ao habilitar persistência:", err));
+
+// Declarar variável global do usuário atual
+let usuarioAtual = null;
