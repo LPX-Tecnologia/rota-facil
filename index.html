@@ -3,60 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RotaFácil</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>RotaFácil - Gestão de Entregas</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
-    <header>
-        <h1>RotaFácil</h1>
-        <nav>
-            <button onclick="mostrarTela('lista')">Romaneios</button>
-            <button onclick="mostrarTela('scanner')">Escanear</button>
-            <button onclick="mostrarTela('mapa')">Mapa</button>
+    <!-- Tela de Login -->
+    <div id="tela-login" class="tela-auth ativa">
+        <div class="auth-container">
+            <div class="logo">
+                <i class="fas fa-truck"></i>
+                <h1>RotaFácil</h1>
+            </div>
+            <form id="form-login">
+                <input type="email" id="login-email" placeholder="E-mail" required>
+                <input type="password" id="login-senha" placeholder="Senha" required>
+                <button type="submit" class="btn-primario">Entrar</button>
+            </form>
+            <p>Ainda não tem conta? <a href="#" onclick="mostrarCadastro()">Cadastre-se</a></p>
+        </div>
+    </div>
+
+    <!-- Tela de Cadastro -->
+    <div id="tela-cadastro" class="tela-auth">
+        <div class="auth-container">
+            <div class="logo">
+                <i class="fas fa-truck"></i>
+                <h1>RotaFácil</h1>
+            </div>
+            <form id="form-cadastro">
+                <input type="text" id="cad-nome" placeholder="Nome completo" required>
+                <input type="email" id="cad-email" placeholder="E-mail" required>
+                <input type="password" id="cad-senha" placeholder="Senha" required>
+                <input type="password" id="cad-confirmar" placeholder="Confirmar senha" required>
+                <button type="submit" class="btn-primario">Cadastrar</button>
+            </form>
+            <p>Já tem conta? <a href="#" onclick="mostrarLogin()">Entrar</a></p>
+        </div>
+    </div>
+
+    <!-- App principal (oculto até login) -->
+    <div id="app" class="app-container">
+        <!-- Barra superior -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+                <span class="titulo">RotaFácil</span>
+            </div>
+            <div class="topbar-right">
+                <img id="foto-perfil-topo" class="avatar" src="" alt="Perfil">
+            </div>
+        </header>
+
+        <!-- Menu lateral -->
+        <nav id="menu-lateral" class="menu-lateral">
+            <ul>
+                <li><a href="#" onclick="mostrarTela('dashboard')"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#" onclick="mostrarTela('lista')"><i class="fas fa-list"></i> Romaneios</a></li>
+                <li><a href="#" onclick="mostrarTela('scanner')"><i class="fas fa-qrcode"></i> Escanear</a></li>
+                <li><a href="#" onclick="mostrarTela('mapa')"><i class="fas fa-map-marked-alt"></i> Mapa</a></li>
+                <li><a href="#" onclick="mostrarTela('perfil')"><i class="fas fa-user"></i> Perfil</a></li>
+                <li><a href="#" onclick="mostrarTela('historico')"><i class="fas fa-history"></i> Histórico</a></li>
+                <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+            </ul>
         </nav>
-    </header>
 
-    <main>
-        <!-- Tela Lista de Romaneios -->
-        <section id="tela-lista" class="tela ativa">
-            <div id="lista-romaneios"></div>
-            <button onclick="mostrarTela('scanner')">Adicionar Romaneio</button>
-        </section>
+        <!-- Conteúdo -->
+        <main class="conteudo">
+            <!-- Dashboard -->
+            <section id="tela-dashboard" class="tela ativa">
+                <h2>Bem-vindo, <span id="nome-motorista"></span></h2>
+                <div class="cards-resumo">
+                    <div class="card">
+                        <i class="fas fa-box"></i>
+                        <span>Romaneios pendentes</span>
+                        <strong id="cont-pendentes">0</strong>
+                    </div>
+                    <div class="card">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Concluídos hoje</span>
+                        <strong id="cont-concluidos">0</strong>
+                    </div>
+                </div>
+                <button class="btn-primario" onclick="mostrarTela('scanner')">Adicionar Romaneio</button>
+                <button class="btn-secundario" onclick="mostrarTela('mapa')">Ver Mapa</button>
+            </section>
 
-        <!-- Tela Scanner -->
-        <section id="tela-scanner" class="tela">
-            <div id="reader"></div>
-            <input type="text" id="numero-manual" placeholder="Digite o número do romaneio">
-            <button onclick="buscarRomaneioManual()">Buscar</button>
-            <button onclick="capturarFoto()">Tirar Foto (OCR)</button>
-            <input type="file" id="input-foto" accept="image/*" capture="camera" style="display:none">
-        </section>
+            <!-- Lista de Romaneios -->
+            <section id="tela-lista" class="tela">
+                <h2>Meus Romaneios</h2>
+                <div id="lista-romaneios"></div>
+            </section>
 
-        <!-- Tela Mapa -->
-        <section id="tela-mapa" class="tela">
-            <div id="map"></div>
-            <button onclick="iniciarRota()">Iniciar Rota</button>
-        </section>
+            <!-- Scanner -->
+            <section id="tela-scanner" class="tela">
+                <h2>Escanear Romaneio</h2>
+                <div id="reader"></div>
+                <input type="text" id="numero-manual" placeholder="Digite o número do romaneio">
+                <button class="btn-primario" onclick="buscarRomaneioManual()">Buscar</button>
+                <button class="btn-secundario" onclick="capturarFoto()">Tirar Foto (OCR)</button>
+                <input type="file" id="input-foto" accept="image/*" capture="camera" style="display:none">
+            </section>
 
-        <!-- Tela Navegação -->
-        <section id="tela-navegacao" class="tela">
-            <div id="mapa-navegacao"></div>
-            <div id="instrucao"></div>
-            <button onclick="concluirParada()">Concluir Parada</button>
-        </section>
-    </main>
+            <!-- Mapa -->
+            <section id="tela-mapa" class="tela">
+                <h2>Mapa de Entregas</h2>
+                <div id="map"></div>
+                <button class="btn-primario" onclick="abrirDialogoRota()">Iniciar Rota</button>
+            </section>
 
+            <!-- Perfil -->
+            <section id="tela-perfil" class="tela">
+                <h2>Meu Perfil</h2>
+                <div class="perfil-container">
+                    <div class="foto-perfil">
+                        <img id="foto-perfil" src="img/avatar-placeholder.png" alt="Foto do motorista">
+                        <label for="input-foto-perfil" class="btn-trocar-foto"><i class="fas fa-camera"></i></label>
+                        <input type="file" id="input-foto-perfil" accept="image/*" style="display:none">
+                    </div>
+                    <div class="dados-perfil">
+                        <label>Nome:</label>
+                        <input type="text" id="perfil-nome" disabled>
+                        <label>E-mail:</label>
+                        <input type="email" id="perfil-email" disabled>
+                    </div>
+                    <button class="btn-secundario" onclick="editarPerfil()">Editar</button>
+                </div>
+            </section>
+
+            <!-- Histórico -->
+            <section id="tela-historico" class="tela">
+                <h2>Rotas Concluídas Hoje</h2>
+                <div id="lista-historico"></div>
+                <button class="btn-primario" onclick="compartilharHistorico()"><i class="fas fa-share"></i> Compartilhar</button>
+            </section>
+        </main>
+    </div>
+
+    <!-- Diálogo de tipo de rota -->
+    <div id="dialogo-rota" class="modal">
+        <div class="modal-conteudo">
+            <h3>Escolha o tipo de rota</h3>
+            <button class="btn-rota" onclick="escolherTipoRota('rapida')">Rápida</button>
+            <button class="btn-rota" onclick="escolherTipoRota('normal')">Normal</button>
+            <button class="btn-rota" onclick="escolherTipoRota('demorada')">Demorada</button>
+            <button class="btn-cancelar" onclick="fecharDialogoRota()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-    <script src="js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/scanner.js"></script>
     <script src="js/ocr.js"></script>
-    <script src="js/storage.js"></script>
     <script src="js/map.js"></script>
     <script src="js/route.js"></script>
     <script src="js/navigation.js"></script>
+    <script src="js/perfil.js"></script>
+    <script src="js/historico.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
