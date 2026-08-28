@@ -45,6 +45,11 @@ async function buscarRomaneio(numero) {
     }
     atualizarLista();
     mostrarTela('lista');
+
+    // Se a tela do mapa estiver ativa, atualizar o mapa imediatamente
+    if (document.getElementById('tela-mapa').classList.contains('ativa')) {
+        mostrarTodosClientesNoMapa();
+    }
 }
 
 // Atualizar lista de romaneios na tela
