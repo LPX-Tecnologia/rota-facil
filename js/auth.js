@@ -1,4 +1,4 @@
-// Referências aos elementos do formulário
+// Referências aos elementos do formulário (usar const, mas apenas uma vez)
 const formLogin = document.getElementById('form-login');
 const formCadastro = document.getElementById('form-cadastro');
 
@@ -16,20 +16,17 @@ formCadastro.addEventListener('submit', async (e) => {
     }
 
     try {
-        // Criar usuário no Firebase Authentication
         const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
         const user = userCredential.user;
 
-        // Salvar dados adicionais no Firestore
         await db.collection('usuarios').doc(user.uid).set({
             nome: nome,
             email: email,
-            foto: null, // será preenchida depois
+            foto: null,
             criadoEm: firebase.firestore.FieldValue.serverTimestamp()
         });
 
         alert('Cadastro realizado com sucesso!');
-        // Redirecionar (a tela será atualizada pelo onAuthStateChanged)
     } catch (error) {
         console.error('Erro no cadastro:', error);
         alert('Erro ao cadastrar: ' + error.message);
@@ -44,7 +41,6 @@ formLogin.addEventListener('submit', async (e) => {
 
     try {
         await auth.signInWithEmailAndPassword(email, senha);
-        // O onAuthStateChanged cuidará da navegação
     } catch (error) {
         console.error('Erro no login:', error);
         alert('Erro ao entrar: ' + error.message);
@@ -56,7 +52,6 @@ auth.onAuthStateChanged(async (user) => {
     if (user) {
         // Usuário logado
         usuarioAtual = user;
-        // Buscar dados adicionais no Firestore
         const doc = await db.collection('usuarios').doc(user.uid).get();
         if (doc.exists) {
             usuarioAtual.nome = doc.data().nome;
@@ -64,17 +59,14 @@ auth.onAuthStateChanged(async (user) => {
         }
         entrarApp();
     } else {
-        // Usuário deslogado
         usuarioAtual = null;
         mostrarLogin();
     }
 });
 
-// Função de logout
 async function logout() {
     try {
         await auth.signOut();
-        // O onAuthStateChanged atualizará a interface
     } catch (error) {
         console.error('Erro ao sair:', error);
     }
