@@ -1,74 +1,41 @@
-// Instâncias localForage
-const usuariosDB = localforage.createInstance({ name: "rotafacil", storeName: "usuarios" });
-const romaneioDB = localforage.createInstance({ name: "rotafacil", storeName: "romaneios" });
-const rotasDB = localforage.createInstance({ name: "rotafacil", storeName: "rotas" });
-const sessaoDB = localforage.createInstance({ name: "rotafacil", storeName: "sessao" });
-
-// Usuários
+// Funções para usuários
 async function salvarUsuario(usuario) {
-    await usuariosDB.setItem(usuario.email, usuario);
+    // Não usada diretamente; o cadastro já salva no Firestore.
+    // Mas podemos atualizar o documento do usuário logado.
+    if (auth.currentUser) {
+        await db.collection('usuarios').doc(auth.currentUser.uid).update(usuario);
+    }
 }
 
-async function obterUsuario(email) {
-    return await usuariosDB.getItem(email);
+async function obterUsuario(uid) {
+    const doc = await db.collection('usuarios').doc(uid).get();
+    return doc.exists ? doc.data() : null;
 }
 
-// Sessão
-async function salvarSessao(email) {
-    await sessaoDB.setItem('usuarioAtual', email);
-}
-
-async function obterSessao() {
-    return await sessaoDB.getItem('usuarioAtual');
-}
-
-async function limparSessao() {
-    await sessaoDB.removeItem('usuarioAtual');
-}
-
-// Romaneios
+// Funções para romaneios
 async function salvarRomaneio(romaneio) {
-    await romaneioDB.setItem(romaneio.numero, romaneio);
+    await db.collection('romaneios').doc(romaneio.numero).set(romaneio);
 }
 
 async function obterRomaneio(numero) {
-    return await romaneioDB.getItem(numero);
+    const doc = await db.collection('romaneios').doc(numero).get();
+    return doc.exists ? doc.data() : null;
 }
 
 async function listarRomaneios() {
-    const romaneios = [];
-    await romaneioDB.iterate((value) => romaneios.push(value));
-    return romaneios;
+    const snapshot = await db.collection('romaneios').orderBy('dataEmissao', 'desc').get();
+    return snapshot.docs.map(doc => doc.data());
 }
 
-// Rotas concluídas
+// Funções para rotas concluídas
 async function salvarRotaConcluida(rota) {
-    const id = Date.now().toString();
-    await rotasDB.setItem(id, rota);
+    await db.collection('rotas').add(rota);
 }
 
 async function listarRotasConcluidas() {
-    const rotas = [];
-    await rotasDB.iterate((value) => rotas.push(value));
-    return rotas;
-}// js/storage.js
-const romaneioDB = localforage.createInstance({
-    name: "rotafacil",
-    storeName: "romaneios"
-});
-
-async function salvarRomaneio(romaneio) {
-    await romaneioDB.setItem(romaneio.numero, romaneio);
-}
-
-async function obterRomaneio(numero) {
-    return await romaneioDB.getItem(numero);
-}
-
-async function listarRomaneios() {
-    const romaneios = [];
-    await romaneioDB.iterate((value, key) => {
-        romaneios.push(value);
-    });
-    return romaneios;
+    const snapshot = await db.collection('rotas')
+        .where('motoristaUid', '==', auth.currentUser.uid)
+        .orderBy('data', 'desc')
+        .get();
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
