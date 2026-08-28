@@ -1,4 +1,3 @@
-// app.js
 function entrarApp() {
     document.getElementById('tela-login').classList.remove('ativa');
     document.getElementById('tela-cadastro').classList.remove('ativa');
@@ -8,12 +7,6 @@ function entrarApp() {
     atualizarLista();
     atualizarResumo();
     carregarHistorico();
-}
-
-function mostrarLogin() {
-    document.getElementById('tela-login').classList.add('ativa');
-    document.getElementById('tela-cadastro').classList.remove('ativa');
-    document.getElementById('app').style.display = 'none';
 }
 
 function mostrarTela(id) {
@@ -35,5 +28,15 @@ function fecharMenu() {
 }
 
 function atualizarResumo() {
-    // Implemente a contagem real
+    // Contar romaneios pendentes e concluídos
+    listarRomaneios().then(romaneios => {
+        let pendentes = 0;
+        romaneios.forEach(rom => {
+            if (rom.status !== 'concluido') pendentes++;
+        });
+        document.getElementById('cont-pendentes').textContent = pendentes;
+    });
+    listarRotasConcluidas().then(rotas => {
+        document.getElementById('cont-concluidos').textContent = rotas.length;
+    });
 }
