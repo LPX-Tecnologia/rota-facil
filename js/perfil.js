@@ -4,7 +4,6 @@ document.getElementById('input-foto-perfil').addEventListener('change', async (e
     const reader = new FileReader();
     reader.onload = async (ev) => {
         const fotoBase64 = ev.target.result;
-        // Salvar no Firestore
         await db.collection('usuarios').doc(auth.currentUser.uid).update({
             foto: fotoBase64
         });
@@ -16,7 +15,7 @@ document.getElementById('input-foto-perfil').addEventListener('change', async (e
 });
 
 function carregarFotoPerfil() {
-    const foto = usuarioAtual.foto || 'img/avatar-placeholder.png';
+    const foto = usuarioAtual.foto || 'https://ui-avatars.com/api/?name=Usuário&background=1a73e8&color=fff';
     document.getElementById('foto-perfil-topo').src = foto;
     document.getElementById('foto-perfil').src = foto;
     document.getElementById('perfil-nome').value = usuarioAtual.nome || '';
@@ -37,5 +36,5 @@ async function editarPerfil() {
             usuarioAtual.nome = novoNome;
             alert('Nome atualizado!');
         }
-    });
+    }, { once: true });
 }
