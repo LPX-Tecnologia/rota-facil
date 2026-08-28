@@ -1,5 +1,9 @@
-// Cadastro
-document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
+// Referências aos elementos do formulário
+const formLogin = document.getElementById('form-login');
+const formCadastro = document.getElementById('form-cadastro');
+
+// Evento de cadastro
+formCadastro.addEventListener('submit', async (e) => {
     e.preventDefault();
     const nome = document.getElementById('cad-nome').value;
     const email = document.getElementById('cad-email').value;
@@ -11,45 +15,67 @@ document.getElementById('form-cadastro').addEventListener('submit', async (e) =>
         return;
     }
 
-    const usuarioExistente = await obterUsuario(email);
-    if (usuarioExistente) {
-        alert('E-mail já cadastrado!');
-        return;
-    }
+    try {
+        // Criar usuário no Firebase Authentication
+        const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
+        const user = userCredential.user;
 
-    const usuario = { nome, email, senha, foto: null };
-    await salvarUsuario(usuario);
-    await salvarSessao(email);
-    entrarApp();
+        // Salvar dados adicionais no Firestore
+        await db.collection('usuarios').doc(user.uid).set({
+            nome: nome,
+            email: email,
+            foto: null, // será preenchida depois
+            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert('Cadastro realizado com sucesso!');
+        // Redirecionar (a tela será atualizada pelo onAuthStateChanged)
+    } catch (error) {
+        console.error('Erro no cadastro:', error);
+        alert('Erro ao cadastrar: ' + error.message);
+    }
 });
 
-// Login
-document.getElementById('form-login').addEventListener('submit', async (e) => {
+// Evento de login
+formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const senha = document.getElementById('login-senha').value;
 
-    const usuario = await obterUsuario(email);
-    if (!usuario || usuario.senha !== senha) {
-        alert('Credenciais inválidas!');
-        return;
+    try {
+        await auth.signInWithEmailAndPassword(email, senha);
+        // O onAuthStateChanged cuidará da navegação
+    } catch (error) {
+        console.error('Erro no login:', error);
+        alert('Erro ao entrar: ' + error.message);
     }
-
-    await salvarSessao(email);
-    entrarApp();
 });
 
-function mostrarLogin() {
-    document.getElementById('tela-cadastro').classList.remove('ativa');
-    document.getElementById('tela-login').classList.add('ativa');
-}
+// Observador de estado de autenticação
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        // Usuário logado
+        usuarioAtual = user;
+        // Buscar dados adicionais no Firestore
+        const doc = await db.collection('usuarios').doc(user.uid).get();
+        if (doc.exists) {
+            usuarioAtual.nome = doc.data().nome;
+            usuarioAtual.foto = doc.data().foto;
+        }
+        entrarApp();
+    } else {
+        // Usuário deslogado
+        usuarioAtual = null;
+        mostrarLogin();
+    }
+});
 
-function mostrarCadastro() {
-    document.getElementById('tela-login').classList.remove('ativa');
-    document.getElementById('tela-cadastro').classList.add('ativa');
-}
-
+// Função de logout
 async function logout() {
-    await limparSessao();
-    location.reload();
+    try {
+        await auth.signOut();
+        // O onAuthStateChanged atualizará a interface
+    } catch (error) {
+        console.error('Erro ao sair:', error);
+    }
 }
