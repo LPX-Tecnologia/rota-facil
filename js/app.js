@@ -13,6 +13,12 @@ function mostrarTela(id) {
     document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
     document.getElementById('tela-' + id).classList.add('ativa');
     fecharMenu();
+
+    // Parar rastreamento se sair da tela mapa
+    if (id !== 'mapa') {
+        if (typeof pararRastreamento === 'function') pararRastreamento();
+    }
+
     if (id === 'mapa') {
         inicializarMapa();
         mostrarTodosClientesNoMapa();
