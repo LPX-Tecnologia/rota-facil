@@ -7,9 +7,12 @@ document.getElementById('input-foto').addEventListener('change', async (e) => {
     if (!file) return;
     const result = await Tesseract.recognize(file, 'por', { logger: m => console.log(m) });
     const texto = result.data.text;
-    // Parse do texto para extrair dados (exemplo simples)
     const numero = extrairNumeroRomaneio(texto);
-    if (numero) buscarRomaneio(numero);
+    if (numero) {
+        buscarRomaneio(numero);
+    } else {
+        alert('Não foi possível identificar o número do romaneio na foto.');
+    }
 });
 
 function extrairNumeroRomaneio(texto) {
