@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RotaFácil</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <header>
+        <h1>RotaFácil</h1>
+        <nav>
+            <button onclick="mostrarTela('lista')">Romaneios</button>
+            <button onclick="mostrarTela('scanner')">Escanear</button>
+            <button onclick="mostrarTela('mapa')">Mapa</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Tela Lista de Romaneios -->
+        <section id="tela-lista" class="tela ativa">
+            <div id="lista-romaneios"></div>
+            <button onclick="mostrarTela('scanner')">Adicionar Romaneio</button>
+        </section>
+
+        <!-- Tela Scanner -->
+        <section id="tela-scanner" class="tela">
+            <div id="reader"></div>
+            <input type="text" id="numero-manual" placeholder="Digite o número do romaneio">
+            <button onclick="buscarRomaneioManual()">Buscar</button>
+            <button onclick="capturarFoto()">Tirar Foto (OCR)</button>
+            <input type="file" id="input-foto" accept="image/*" capture="camera" style="display:none">
+        </section>
+
+        <!-- Tela Mapa -->
+        <section id="tela-mapa" class="tela">
+            <div id="map"></div>
+            <button onclick="iniciarRota()">Iniciar Rota</button>
+        </section>
+
+        <!-- Tela Navegação -->
+        <section id="tela-navegacao" class="tela">
+            <div id="mapa-navegacao"></div>
+            <div id="instrucao"></div>
+            <button onclick="concluirParada()">Concluir Parada</button>
+        </section>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/scanner.js"></script>
+    <script src="js/ocr.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/route.js"></script>
+    <script src="js/navigation.js"></script>
+</body>
+</html>
