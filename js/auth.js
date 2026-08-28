@@ -1,7 +1,21 @@
-// auth.js
+// Referências aos formulários
 const formLogin = document.getElementById('form-login');
 const formCadastro = document.getElementById('form-cadastro');
 
+// Funções para alternar telas
+function mostrarLogin() {
+    document.getElementById('tela-login').classList.add('ativa');
+    document.getElementById('tela-cadastro').classList.remove('ativa');
+    document.getElementById('app').style.display = 'none';
+}
+
+function mostrarCadastro() {
+    document.getElementById('tela-login').classList.remove('ativa');
+    document.getElementById('tela-cadastro').classList.add('ativa');
+    document.getElementById('app').style.display = 'none';
+}
+
+// Evento de cadastro
 formCadastro.addEventListener('submit', async (e) => {
     e.preventDefault();
     const nome = document.getElementById('cad-nome').value;
@@ -22,12 +36,15 @@ formCadastro.addEventListener('submit', async (e) => {
             foto: null,
             criadoEm: firebase.firestore.FieldValue.serverTimestamp()
         });
-        alert('Cadastro realizado!');
+        alert('Cadastro realizado com sucesso!');
+        // O onAuthStateChanged cuidará da navegação
     } catch (error) {
-        alert('Erro: ' + error.message);
+        console.error('Erro no cadastro:', error);
+        alert('Erro ao cadastrar: ' + error.message);
     }
 });
 
+// Evento de login
 formLogin.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
@@ -35,15 +52,17 @@ formLogin.addEventListener('submit', async (e) => {
 
     try {
         await auth.signInWithEmailAndPassword(email, senha);
+        // O onAuthStateChanged cuidará da navegação
     } catch (error) {
-        alert('Erro: ' + error.message);
+        console.error('Erro no login:', error);
+        alert('Erro ao entrar: ' + error.message);
     }
 });
 
-// Observador de autenticação
+// Observador de estado de autenticação
 auth.onAuthStateChanged(async (user) => {
     if (user) {
-        // Buscar dados extras no Firestore
+        // Usuário logado
         const doc = await db.collection('usuarios').doc(user.uid).get();
         if (doc.exists) {
             usuarioAtual = {
@@ -67,10 +86,12 @@ auth.onAuthStateChanged(async (user) => {
     }
 });
 
+// Função de logout
 async function logout() {
     try {
         await auth.signOut();
+        // O onAuthStateChanged atualizará a interface
     } catch (error) {
-        console.error(error);
+        console.error('Erro ao sair:', error);
     }
 }
