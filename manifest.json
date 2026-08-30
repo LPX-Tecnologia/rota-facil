@@ -23,7 +23,7 @@
       "purpose": "any"
     },
     {
-      "src": "icones/icon-192.png",
+      "src": "icones/192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
