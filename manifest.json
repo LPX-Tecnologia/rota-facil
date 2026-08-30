@@ -1,32 +1,20 @@
-{
-  "name": "Rota Fácil",
-  "short_name": "RotaFácil",
-  "description": "Aplicativo para facilitar suas rotas e deslocamentos diários.",
-  "start_url": "/rota-facil/",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
-  "dir": "ltr",
-  "lang": "pt-BR",
-  "icons": [
-    {
-      "src": "rota-facil/icones/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "rota-facil/icones/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icones/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ]
-}
+"icons": [
+  {
+    "src": "rota-facil/icones/icon-192.png",   // caminho errado
+    "sizes": "192x192",
+    "type": "image/png",
+    "purpose": "any"
+  },
+  {
+    "src": "rota-facil/icones/icon-512.png",   // caminho errado
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "any"
+  },
+  {
+    "src": "icones/icon-192.png",              // caminho certo
+    "sizes": "192x192",
+    "type": "image/png",
+    "purpose": "maskable"
+  }
+]
